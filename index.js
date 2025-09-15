@@ -7,27 +7,64 @@ import reviewRoutes from './src/routes/review.routes.js'
 
 const app = express()
 
+// Configurar CORS para permitir peticiones desde cualquier origen (en producción esto debería limitarse)
 app.use(cors())
 
 // Middleware para parsear JSON
 app.use(express.json())
 
-// Rutas
+// Aplicar rutas
 app.use(reviewRoutes)
 
-// Ruta raíz para verificar que el servicio está funcionando
-app.get('/', (req, res) => {
+// Ruta raíz para verificar que el servicio está funcionando y mostrar documentación
+app.get('/routes', (req, res) => {
   res.json({
     message: 'Microservicio de Reseñas API',
-    status: 'online',
-    version: '1.0.0',
     endpoints: {
-      createReview: 'POST /api/reviews',
-      getProductReviews: 'GET /api/reviews/product/:productId',
-      getUserReviews: 'GET /api/reviews/user/:userId',
-      getProductRating: 'GET /api/reviews/product/:productId/rating',
-      updateReview: 'PUT /api/reviews/:reviewId',
-      deleteReview: 'DELETE /api/reviews/:reviewId',
+      createReview: {
+        method: 'POST',
+        url: '/create',
+        description: 'Crear una nueva reseña',
+        body: {
+          userId: 'string (requerido)',
+          productId: 'string (requerido)',
+          rating: 'número entre 1-5 (requerido)',
+          comment: 'string min:5, max:500 (requerido)',
+        },
+        response: {
+          201: 'Reseña creada exitosamente',
+          400: 'Datos inválidos o el usuario ya ha dejado una reseña para este producto',
+          500: 'Error interno del servidor',
+        },
+      },
+      getReviews: {
+        method: 'GET',
+        url: '/reviews',
+        description: 'Obtener todas las reseñas con filtrado opcional',
+        queryParams: {
+          page: 'número (opcional, default: 1)',
+          limit: 'número (opcional, default: 10)',
+          productId: 'string (opcional, filtrar por producto)',
+          userId: 'string (opcional, filtrar por usuario)',
+          sortBy: 'string (opcional, default: createdAt)',
+          order: 'string (opcional, asc o desc, default: desc)',
+        },
+        response: {
+          200: 'Lista de reseñas con metadatos de paginación',
+          500: 'Error interno del servidor',
+        },
+      },
+      getReviewById: {
+        method: 'GET',
+        url: '/reviews/:id',
+        description: 'Obtener una reseña específica por su ID',
+        response: {
+          200: 'Reseña encontrada',
+          404: 'Reseña no encontrada',
+          400: 'ID de reseña inválido',
+          500: 'Error interno del servidor',
+        },
+      },
     },
   })
 })
