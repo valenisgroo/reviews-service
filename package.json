@@ -1,5 +1,5 @@
 {
-  "name": "microservicio-recomendaciones",
+  "name": "microservicio-reviews",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "amqplib": "^0.10.9",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",

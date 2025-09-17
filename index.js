@@ -4,16 +4,14 @@ import cors from 'cors'
 import { PORT } from './config/dotenv.js'
 import { connectDB } from './config/bd.js'
 import reviewRoutes from './src/routes/review.routes.js'
+import { connectRabbitMQ } from './config/rabbit.js'
 
 const app = express()
 
-// Configurar CORS para permitir peticiones desde cualquier origen (en producción esto debería limitarse)
 app.use(cors())
-
-// Middleware para parsear JSON
 app.use(express.json())
+app.use(express.static('public'))
 
-// Aplicar rutas
 app.use(reviewRoutes)
 
 // Ruta raíz para verificar que el servicio está funcionando y mostrar documentación
@@ -91,3 +89,4 @@ app.listen(PORT, () => {
 })
 
 connectDB()
+connectRabbitMQ()
