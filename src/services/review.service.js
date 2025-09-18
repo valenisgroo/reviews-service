@@ -1,5 +1,5 @@
 import Review from '../models/review.model.js'
-import { moderateContent } from '../utils/review.utils.js'
+import moderateReviewContent from '../utils/moderation.utils.js'
 
 const createNewReview = async reviewData => {
   try {
@@ -15,8 +15,8 @@ const createNewReview = async reviewData => {
       throw error
     }
 
-    // Moderar contenido
-    const moderationResult = moderateContent(comment)
+    // Moderar contenido con lógica externa (utils/moderation.utils.js)
+    const moderationResult = moderateReviewContent(comment)
 
     // Crear la reseña con el resultado de la moderación
     const newReview = new Review({
@@ -119,4 +119,37 @@ export default {
   createNewReview,
   getReviews,
   getReviewById,
+}
+
+// Agrega función para moderación manual
+export const moderateReviewById = async (id, decision, reason) => {
+  try {
+    const review = await Review.findById(id)
+    if (!review) {
+      const err = new Error('Reseña no encontrada')
+      err.statusCode = 404
+      throw err
+    }
+
+    const updates = {
+      isModerated: true,
+      isApproved: decision === 'Aprobada',
+      moderationReason:
+        reason ||
+        (decision === 'Aprobada'
+          ? 'Aprobada manualmente'
+          : 'Rechazada manualmente'),
+    }
+
+    const updated = await Review.findByIdAndUpdate(id, updates, { new: true })
+    return updated
+  } catch (error) {
+    if (error.name === 'CastError') {
+      const e = new Error('ID de reseña inválido')
+      e.statusCode = 400
+      throw e
+    }
+    if (!error.statusCode) error.statusCode = 500
+    throw error
+  }
 }

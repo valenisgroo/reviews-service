@@ -41,6 +41,15 @@ export const listReviewsQuerySchema = z.object({
   order: z.enum(['asc', 'desc']).default('desc'),
 })
 
+export const moderateReviewSchema = z.object({
+  decision: z.enum(['Aprobada', 'Rechazada'], {
+    errorMap: () => ({
+      message: 'La decisión debe ser "Aprobada" o "Rechazada"',
+    }),
+  }),
+  reason: z.string().min(3).max(200).optional(),
+})
+
 export const validateSchema = schema => {
   return (req, res, next) => {
     try {

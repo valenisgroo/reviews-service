@@ -1,4 +1,5 @@
 import reviewService from '../services/review.service.js'
+import { moderateReviewById } from '../services/review.service.js'
 import { formatReview } from '../utils/review.utils.js'
 
 export const createReview = async (req, res) => {
@@ -77,5 +78,39 @@ export const getReviewById = async (req, res) => {
       status: 'error',
       message: errorMessage,
     })
+  }
+}
+
+export const moderateReview = async (req, res) => {
+  try {
+    const { id } = req.params
+    const { decision, reason } = req.validatedData || req.body
+
+    if (!decision || !['Aprobada', 'Rechazada'].includes(decision)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'La decisión debe ser "Aprobada" o "Rechazada"',
+      })
+    }
+
+    const updated = await moderateReviewById(id, decision, reason)
+
+    return res.status(200).json({
+      status: 'success',
+      message: `Reseña ${
+        decision === 'Aprobada' ? 'Aprobada' : 'Rechazada'
+      } correctamente`,
+      data: formatReview(updated),
+    })
+  } catch (error) {
+    console.error('Error al moderar la reseña:', error)
+    const statusCode = error.statusCode || 500
+    const errorMessage =
+      statusCode === 500
+        ? 'Error interno del servidor al moderar la reseña'
+        : error.message
+    return res
+      .status(statusCode)
+      .json({ status: 'error', message: errorMessage })
   }
 }
