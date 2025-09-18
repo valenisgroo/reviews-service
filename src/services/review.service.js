@@ -8,23 +8,17 @@ const createNewReview = async reviewData => {
     // Verificar si el usuario ya ha dejado una reseña para este producto
     const existingReview = await Review.findOne({ userId, productId })
     if (existingReview) {
-      const error = new Error(
-        'El usuario ya ha dejado una reseña para este producto'
-      )
-      error.statusCode = 400
-      throw error
+      throw new Error('El usuario ya ha dejado una reseña para este producto')
     }
 
-    // Moderar contenido con lógica externa (utils/moderation.utils.js)
-    const moderationResult = moderateReviewContent(comment)
-
-    // Crear la reseña con el resultado de la moderación
+    // Crear la reseña en estado pending (sin moderar automáticamente)
     const newReview = new Review({
       userId,
       productId,
       rating,
       comment,
-      ...moderationResult,
+      status: 'pending', 
+      statusReason: 'Esperando moderación',
     })
 
     const savedReview = await newReview.save()
@@ -60,8 +54,8 @@ const getReviews = async (options = {}) => {
     if (productId) filter.productId = productId
     if (userId) filter.userId = userId
 
-    // Solo mostrar reseñas aprobadas por defecto
-    filter.isApproved = true
+    // Solo mostrar reseñas aceptadas por defecto
+    filter.status = 'accepted'
 
     // Configurar el orden
     const sort = { [sortBy]: order === 'asc' ? 1 : -1 }
@@ -131,17 +125,22 @@ export const moderateReviewById = async (id, decision, reason) => {
       throw err
     }
 
-    const updates = {
-      isModerated: true,
-      isApproved: decision === 'Aprobada',
-      moderationReason:
-        reason ||
-        (decision === 'Aprobada'
-          ? 'Aprobada manualmente'
-          : 'Rechazada manualmente'),
+    let newStatus, newReason
+
+    if (decision === 'Aprobada') {
+      newStatus = 'moderated'
+      newReason =
+        reason || 'Aprobada manualmente - pendiente verificación de orden'
+    } else {
+      newStatus = 'rejected'
+      newReason = reason || 'Rechazada manualmente'
     }
 
-    const updated = await Review.findByIdAndUpdate(id, updates, { new: true })
+    const updated = await Review.findByIdAndUpdate(
+      id,
+      { status: newStatus, statusReason: newReason },
+      { new: true }
+    )
     return updated
   } catch (error) {
     if (error.name === 'CastError') {
@@ -154,56 +153,51 @@ export const moderateReviewById = async (id, decision, reason) => {
   }
 }
 
-// Función para moderación automática por lotes (cron job)
+// Función para moderación automática con Cron
 export const moderateAllReviewsBatch = async () => {
   try {
     console.log('Iniciando moderación automática diaria')
 
-    // Buscar todas las reviews aprobadas que no han sido moderadas aún
-    const reviewsToCheck = await Review.find({
-      isApproved: true,
-      isModerated: false,
-    })
+    // Buscar todas las reviews en estado 'pending' (esperando moderación)
+    const reviewsToCheck = await Review.find({ status: 'pending' })
 
     console.log(`Encontradas ${reviewsToCheck.length} reseñas para revisar`)
 
+    let rejectedCount = 0
     let moderatedCount = 0
-    let approvedCount = 0
 
     for (const review of reviewsToCheck) {
-      // Aplicar la misma lógica de moderación que al crear
       const moderationResult = moderateReviewContent(review.comment)
 
-      // Si la moderación indica que debe ser rechazada
       if (!moderationResult.isApproved) {
+        // Rechazar por contenido inapropiado
         await Review.findByIdAndUpdate(review._id, {
-          isApproved: false,
-          isModerated: true,
-          moderationReason: moderationResult.moderationReason,
+          status: 'rejected',
+          statusReason: moderationResult.moderationReason,
         })
-        moderatedCount++
+        rejectedCount++
         console.log(
-          `Review ${review._id} moderada: ${moderationResult.moderationReason}`
+          `Review ${review._id} rechazada: ${moderationResult.moderationReason}`
         )
       } else {
-        // Si NO encuentra problemas, también marcar como moderada
+        // Marcar como moderada (pendiente verificación de orden)
         await Review.findByIdAndUpdate(review._id, {
-          isModerated: true,
-          moderationReason: 'Revisada automáticamente y aprobada',
+          status: 'moderated',
+          statusReason: 'Revisada automáticamente y aprobada',
         })
-        approvedCount++
-        console.log(`Review ${review._id} confirmada como aprobada`)
+        moderatedCount++
+        console.log(`Review ${review._id} marcada como moderada`)
       }
     }
 
     console.log(
-      `Moderación completada. ${moderatedCount} rechazadas, ${approvedCount} confirmadas como aprobadas`
+      `Moderación completada. ${rejectedCount} rechazadas, ${moderatedCount} marcadas como moderadas`
     )
 
     return {
       totalChecked: reviewsToCheck.length,
-      totalModerated: moderatedCount,
-      totalApproved: approvedCount,
+      totalModerated: rejectedCount,
+      totalApproved: moderatedCount,
     }
   } catch (error) {
     console.error('Error en moderación automática:', error)
