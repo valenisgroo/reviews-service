@@ -157,7 +157,7 @@ export const moderateReviewById = async (id, decision, reason) => {
 // Función para moderación automática por lotes (cron job)
 export const moderateAllReviewsBatch = async () => {
   try {
-    console.log('🔍 Iniciando moderación automática diaria...')
+    console.log('Iniciando moderación automática diaria')
 
     // Buscar todas las reviews aprobadas que no han sido moderadas aún
     const reviewsToCheck = await Review.find({
@@ -165,7 +165,7 @@ export const moderateAllReviewsBatch = async () => {
       isModerated: false,
     })
 
-    console.log(`📋 Encontradas ${reviewsToCheck.length} reseñas para revisar`)
+    console.log(`Encontradas ${reviewsToCheck.length} reseñas para revisar`)
 
     let moderatedCount = 0
     let approvedCount = 0
@@ -183,7 +183,7 @@ export const moderateAllReviewsBatch = async () => {
         })
         moderatedCount++
         console.log(
-          `❌ Review ${review._id} moderada: ${moderationResult.moderationReason}`
+          `Review ${review._id} moderada: ${moderationResult.moderationReason}`
         )
       } else {
         // Si NO encuentra problemas, también marcar como moderada
@@ -192,12 +192,12 @@ export const moderateAllReviewsBatch = async () => {
           moderationReason: 'Revisada automáticamente y aprobada',
         })
         approvedCount++
-        console.log(`✅ Review ${review._id} confirmada como aprobada`)
+        console.log(`Review ${review._id} confirmada como aprobada`)
       }
     }
 
     console.log(
-      `✅ Moderación completada. ${moderatedCount} rechazadas, ${approvedCount} confirmadas como aprobadas`
+      `Moderación completada. ${moderatedCount} rechazadas, ${approvedCount} confirmadas como aprobadas`
     )
 
     return {
@@ -206,7 +206,7 @@ export const moderateAllReviewsBatch = async () => {
       totalApproved: approvedCount,
     }
   } catch (error) {
-    console.error('❌ Error en moderación automática:', error)
+    console.error('Error en moderación automática:', error)
     throw error
   }
 }

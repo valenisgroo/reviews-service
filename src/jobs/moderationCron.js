@@ -5,12 +5,12 @@ import { moderateAllReviewsBatch } from '../services/review.service.js'
 // Formato: segundo minuto hora día mes día_semana
 // '0 0 2 * * *' = todos los días a las 2:00 AM
 const setupModerationCron = () => {
-  console.log('Configurando cron job de moderación diaria')
+  console.log('- Configurando cron job de moderación diaria')
 
   cron.schedule(
     '0 0 2 * * *',
     async () => {
-      console.log('Ejecutando moderación automática diaria')
+      console.log('- Ejecutando moderación automática diaria')
 
       try {
         const result = await moderateAllReviewsBatch()
@@ -18,7 +18,7 @@ const setupModerationCron = () => {
           `Resultado: ${result.totalChecked} revisadas, ${result.totalModerated} rechazadas, ${result.totalApproved} confirmadas`
         )
       } catch (error) {
-        console.error('Error en cron de moderación:', error)
+        console.error('- Error en cron de moderación:', error)
       }
     },
     {
@@ -28,18 +28,18 @@ const setupModerationCron = () => {
   )
 
   console.log(
-    '✅ Cron job de moderación configurado para ejecutarse diariamente a las 2:00 AM'
+    '- Cron job de moderación configurado para ejecutarse diariamente a las 2:00 AM'
   )
 }
 
 // Para testing manual - ejecutar inmediatamente el cron
 export const runModerationNow = async () => {
-  console.log('Ejecutando moderación manual...')
+  console.log('- Ejecutando moderación manual...')
   try {
     const result = await moderateAllReviewsBatch()
     return result
   } catch (error) {
-    console.error('Error en moderación manual:', error)
+    console.error('- Error en moderación manual:', error)
     throw error
   }
 }
