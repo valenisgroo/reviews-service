@@ -81,6 +81,44 @@ export const getReviewById = async (req, res) => {
   }
 }
 
+//Leer reseñas pedientes
+
+//Leer reseñas aprobadas
+
+export const getPendingReviews = async (req, res) => {
+  try {
+    const result = await reviewService.getReviews({ status: 'pending' })
+    res.status(200).json({
+      status: 'success',
+      data: result.reviews.map(review => formatReview(review)),
+      metadata: result.metadata,
+    })
+  } catch (error) {
+    const statusCode = error.statusCode || 500
+    res.status(statusCode).json({
+      status: 'error',
+      message: 'Error al obtener las reseñas pendientes',
+    })
+  }
+}
+
+export const getApprovedReviews = async (req, res) => {
+  try {
+    const result = await reviewService.getReviews({ status: 'accepted' })
+    res.status(200).json({
+      status: 'success',
+      data: result.reviews.map(review => formatReview(review)),
+      metadata: result.metadata,
+    })
+  } catch (error) {
+    const statusCode = error.statusCode || 500
+    res.status(statusCode).json({
+      status: 'error',
+      message: 'Error al obtener las reseñas aprobadas',
+    })
+  }
+}
+
 export const moderateReview = async (req, res) => {
   try {
     const { id } = req.params
