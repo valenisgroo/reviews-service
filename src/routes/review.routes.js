@@ -3,29 +3,19 @@ import {
   createReview,
   getReviews,
   getReviewById,
+  moderateReview,
+  getReviewsByStatus,
 } from '../controllers/review.controller.js'
-import {
-  validateSchema,
-  validateQuerySchema,
-  createReviewSchema,
-  listReviewsQuerySchema,
-  moderateReviewSchema,
-} from '../validators/review.validator.js'
-// Moderación manual de una reseña
-import { moderateReview } from '../controllers/review.controller.js'
 
 const router = express.Router()
 
-router.post('/create', validateSchema(createReviewSchema), createReview)
-
-router.get('/reviews', validateQuerySchema(listReviewsQuerySchema), getReviews)
-
+// Rutas públicas
+router.post('/create', createReview)
+router.get('/reviews', getReviews)
 router.get('/reviews/:id', getReviewById)
 
-router.patch(
-  '/reviews/:id/moderate',
-  validateSchema(moderateReviewSchema),
-  moderateReview
-)
+// Rutas administrativas
+router.patch('/reviews/:id/moderate', moderateReview)
+router.get('/admin/reviews/:status', getReviewsByStatus)
 
 export default router

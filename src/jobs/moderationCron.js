@@ -1,5 +1,6 @@
 import cron from 'node-cron'
 import { moderateAllReviewsBatch } from '../services/review.service.js'
+import { CustomError } from '../utils/customError.js'
 
 // Cron job que se ejecuta diariamente a las 02:00 AM
 // Formato: segundo minuto hora día mes día_semana
@@ -40,7 +41,7 @@ export const runModerationNow = async () => {
     return result
   } catch (error) {
     console.error('- Error en moderación manual:', error)
-    throw error
+    throw new CustomError('Error durante la moderación manual', 500)
   }
 }
 

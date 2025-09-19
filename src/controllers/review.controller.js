@@ -1,13 +1,18 @@
-import reviewService from '../services/review.service.js'
-import { moderateReviewById } from '../services/review.service.js'
+import {
+  createReviewService,
+  getReviewsService,
+  getReviewByIdService,
+  getReviewsByStatusService,
+  moderateReviewByIdService,
+} from '../services/review.service.js'
 import { formatReview } from '../utils/review.utils.js'
+import { CustomError } from '../utils/customError.js'
 
 export const createReview = async (req, res) => {
   try {
-    // Los datos ya han sido validados por el middleware
-    const reviewData = req.validatedData || req.body
+    const reviewData = req.body
 
-    const newReview = await reviewService.createNewReview(reviewData)
+    const newReview = await createReviewService(reviewData)
 
     res.status(201).json({
       status: 'success',
@@ -15,140 +20,76 @@ export const createReview = async (req, res) => {
       data: formatReview(newReview),
     })
   } catch (error) {
-    console.error('Error al crear la reseña:', error)
-
-    // Manejar errores específicos
-    const statusCode = error.statusCode || 500
-    const errorMessage =
-      statusCode === 500
-        ? 'Error interno del servidor al crear la reseña'
-        : error.message
-
-    res.status(statusCode).json({
-      status: 'error',
-      message: errorMessage,
-    })
+    const status = error instanceof CustomError ? error.statusCode : 500
+    return res.status(status).json({ error: error.message })
   }
 }
 
 export const getReviews = async (req, res) => {
   try {
-    // Usar los parámetros ya validados por el middleware
-    const options = req.validatedQuery || req.query
-
-    const result = await reviewService.getReviews(options)
+    const reviews = await getReviewsService()
 
     // Formatear las reseñas para la respuesta
-    const formattedReviews = result.reviews.map(review => formatReview(review))
+    const formattedReviews = reviews.map(review => formatReview(review))
 
     res.status(200).json({
       status: 'success',
       data: formattedReviews,
-      metadata: result.metadata,
+      total: reviews.length,
     })
   } catch (error) {
-    console.error('Error al obtener las reseñas:', error)
-
-    const statusCode = error.statusCode || 500
-    res.status(statusCode).json({
-      status: 'error',
-      message: 'Error al obtener las reseñas',
-    })
+    const status = error instanceof CustomError ? error.statusCode : 500
+    return res.status(status).json({ error: error.message })
   }
 }
 
 export const getReviewById = async (req, res) => {
   try {
-    const review = await reviewService.getReviewById(req.params.id)
+    const review = await getReviewByIdService(req.params.id)
 
     res.status(200).json({
       status: 'success',
       data: formatReview(review),
     })
   } catch (error) {
-    console.error('Error al obtener la reseña:', error)
-
-    const statusCode = error.statusCode || 500
-    const errorMessage =
-      statusCode === 500
-        ? 'Error interno del servidor al obtener la reseña'
-        : error.message
-
-    res.status(statusCode).json({
-      status: 'error',
-      message: errorMessage,
-    })
+    const status = error instanceof CustomError ? error.statusCode : 500
+    return res.status(status).json({ error: error.message })
   }
 }
 
-//Leer reseñas pedientes
-
-//Leer reseñas aprobadas
-
-export const getPendingReviews = async (req, res) => {
+export const getReviewsByStatus = async (req, res) => {
   try {
-    const result = await reviewService.getReviews({ status: 'pending' })
+    const queryParams = { ...req.params, ...req.query } // Combinar params y query
+    const result = await getReviewsByStatusService(queryParams)
+
     res.status(200).json({
       status: 'success',
       data: result.reviews.map(review => formatReview(review)),
-      metadata: result.metadata,
+      total: result.total,
+      filterStatus: result.status,
     })
   } catch (error) {
-    const statusCode = error.statusCode || 500
-    res.status(statusCode).json({
-      status: 'error',
-      message: 'Error al obtener las reseñas pendientes',
-    })
-  }
-}
-
-export const getApprovedReviews = async (req, res) => {
-  try {
-    const result = await reviewService.getReviews({ status: 'accepted' })
-    res.status(200).json({
-      status: 'success',
-      data: result.reviews.map(review => formatReview(review)),
-      metadata: result.metadata,
-    })
-  } catch (error) {
-    const statusCode = error.statusCode || 500
-    res.status(statusCode).json({
-      status: 'error',
-      message: 'Error al obtener las reseñas aprobadas',
-    })
+    const status = error instanceof CustomError ? error.statusCode : 500
+    return res.status(status).json({ error: error.message })
   }
 }
 
 export const moderateReview = async (req, res) => {
   try {
     const { id } = req.params
-    const { decision, reason } = req.validatedData || req.body
+    const moderationData = req.body // El service ahora valida todo
 
-    if (!decision || !['Aprobada', 'Rechazada'].includes(decision)) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'La decisión debe ser "Aprobada" o "Rechazada"',
-      })
-    }
-
-    const updated = await moderateReviewById(id, decision, reason)
+    const updated = await moderateReviewByIdService(id, moderationData)
 
     return res.status(200).json({
       status: 'success',
       message: `Reseña ${
-        decision === 'Aprobada' ? 'Aprobada' : 'Rechazada'
+        moderationData.decision === 'Aprobada' ? 'aprobada' : 'rechazada'
       } correctamente`,
       data: formatReview(updated),
     })
   } catch (error) {
-    console.error('Error al moderar la reseña:', error)
-    const statusCode = error.statusCode || 500
-    const errorMessage =
-      statusCode === 500
-        ? 'Error interno del servidor al moderar la reseña'
-        : error.message
-    return res
-      .status(statusCode)
-      .json({ status: 'error', message: errorMessage })
+    const status = error instanceof CustomError ? error.statusCode : 500
+    return res.status(status).json({ error: error.message })
   }
 }
