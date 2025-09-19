@@ -5,7 +5,7 @@ import {
   getReviewsByStatusService,
   moderateReviewByIdService,
 } from '../services/review.service.js'
-import { formatReview } from '../utils/review.utils.js'
+import { dtoReview } from '../utils/review.utils.js'
 import { CustomError } from '../utils/customError.js'
 
 export const createReview = async (req, res) => {
@@ -17,7 +17,7 @@ export const createReview = async (req, res) => {
     res.status(201).json({
       status: 'success',
       message: 'Reseña creada exitosamente',
-      data: formatReview(newReview),
+      data: dtoReview(newReview),
     })
   } catch (error) {
     const status = error instanceof CustomError ? error.statusCode : 500
@@ -30,7 +30,7 @@ export const getReviews = async (req, res) => {
     const reviews = await getReviewsService()
 
     // Formatear las reseñas para la respuesta
-    const formattedReviews = reviews.map(review => formatReview(review))
+    const formattedReviews = reviews.map(review => dtoReview(review))
 
     res.status(200).json({
       status: 'success',
@@ -49,7 +49,7 @@ export const getReviewById = async (req, res) => {
 
     res.status(200).json({
       status: 'success',
-      data: formatReview(review),
+      data: dtoReview(review),
     })
   } catch (error) {
     const status = error instanceof CustomError ? error.statusCode : 500
@@ -64,7 +64,7 @@ export const getReviewsByStatus = async (req, res) => {
 
     res.status(200).json({
       status: 'success',
-      data: result.reviews.map(review => formatReview(review)),
+      data: result.reviews.map(review => dtoReview(review)),
       total: result.total,
       filterStatus: result.status,
     })
@@ -86,7 +86,7 @@ export const moderateReview = async (req, res) => {
       message: `Reseña ${
         moderationData.decision === 'Aprobada' ? 'aprobada' : 'rechazada'
       } correctamente`,
-      data: formatReview(updated),
+      data: dtoReview(updated),
     })
   } catch (error) {
     const status = error instanceof CustomError ? error.statusCode : 500
