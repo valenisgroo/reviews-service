@@ -5,7 +5,7 @@ import {
   getReviewsByStatusService,
   moderateReviewByIdService,
 } from '../services/review.service.js'
-import { dtoReview } from '../utils/review.utils.js'
+import { dtoReview } from '../utils/dtoReview.utils.js'
 import { CustomError } from '../utils/customError.js'
 
 export const createReview = async (req, res) => {
