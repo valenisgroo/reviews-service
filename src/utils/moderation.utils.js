@@ -45,22 +45,22 @@ const hasSuspiciousLinks = text => {
 export const moderateReviewContent = comment => {
   if (hasBadWords(comment)) {
     return {
-      isApproved: false,
-      isModerated: true,
-      moderationReason: 'La reseña contiene lenguaje inapropiado',
+      status: 'rejected',
+      statusReason: 'La reseña contiene lenguaje inapropiado',
     }
   }
 
   if (hasSuspiciousLinks(comment)) {
     return {
-      isApproved: false,
-      isModerated: true,
-      moderationReason:
-        'La reseña contiene enlaces no permitidos o sospechosos',
+      status: 'rejected',
+      statusReason: 'La reseña contiene enlaces no permitidos o sospechosos',
     }
   }
 
-  return { isApproved: true, isModerated: false, moderationReason: null }
+  return {
+    status: 'moderated',
+    statusReason: 'Revisada automáticamente y aprobada',
+  }
 }
 
 export default moderateReviewContent

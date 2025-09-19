@@ -222,40 +222,27 @@ export const moderateAllReviewsBatch = async () => {
       )
     }
 
-    if (!moderationResult.isApproved) {
-      // Rechazar por contenido inapropiado
-      const rejectedReview = await Review.findByIdAndUpdate(review._id, {
-        status: 'rejected',
-        statusReason: moderationResult.moderationReason,
-      })
+    // Actualizar la review con el resultado de la moderación
+    const updatedReview = await Review.findByIdAndUpdate(review._id, {
+      status: moderationResult.status,
+      statusReason: moderationResult.statusReason,
+    })
 
-      if (!rejectedReview) {
-        throw new CustomError(
-          `Error al rechazar la reseña ${review._id} en la base de datos`,
-          500
-        )
-      }
+    if (!updatedReview) {
+      throw new CustomError(
+        `Error al actualizar la reseña ${review._id} en la base de datos`,
+        500
+      )
+    }
 
+    if (moderationResult.status === 'rejected') {
       rejectedCount++
       console.log(
-        `Review ${review._id} rechazada: ${moderationResult.moderationReason}`
+        `❌ Review ${review._id} rechazada: ${moderationResult.statusReason}`
       )
     } else {
-      // Marcar como moderada (pendiente verificación de orden)
-      const moderatedReview = await Review.findByIdAndUpdate(review._id, {
-        status: 'moderated',
-        statusReason: 'Revisada automáticamente y aprobada',
-      })
-
-      if (!moderatedReview) {
-        throw new CustomError(
-          `Error al moderar la reseña ${review._id} en la base de datos`,
-          500
-        )
-      }
-
       moderatedCount++
-      console.log(`Review ${review._id} marcada como moderada`)
+      console.log(`✅ Review ${review._id} marcada como moderada`)
     }
   }
 
