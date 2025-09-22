@@ -10,9 +10,16 @@ import { CustomError } from '../utils/customError.js'
 
 export const createReview = async (req, res) => {
   try {
-    const reviewData = req.body
+    // Tomar el userId del usuario autenticado (middleware)
+    const userId = req.user._id || req.user.id
+    const { productId, rating, comment } = req.body
 
-    const newReview = await createReviewService(reviewData)
+    const newReview = await createReviewService({
+      userId,
+      productId,
+      rating,
+      comment,
+    })
 
     res.status(201).json({
       status: 'success',
