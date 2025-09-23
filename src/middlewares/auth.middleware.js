@@ -15,6 +15,11 @@ export async function authMiddleware(req, res, next) {
   if (!token)
     return res.status(401).json({ message: 'Formato de token inválido' })
 
+  // Verifica si el token fue invalidado
+  if (userCache.get(token) === 'invalidated') {
+    return res.status(401).json({ message: 'El token ha sido invalidado' })
+  }
+
   //Revisar cache local
   let userData = userCache.get(token)
   if (userData) {
@@ -43,8 +48,6 @@ export async function authMiddleware(req, res, next) {
 
 // Función para invalidar tokens
 export function invalidate(token) {
-  if (userCache.get(token)) {
-    userCache.del(token)
-    console.log('Token invalidado: ' + token)
-  }
+  userCache.del(token)
+  console.log('Token invalidado: ' + token)
 }
