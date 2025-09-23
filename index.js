@@ -4,7 +4,7 @@ import cors from 'cors'
 import { PORT } from './config/dotenv.js'
 import { connectDB } from './config/bd.js'
 import reviewRoutes from './src/routes/review.routes.js'
-import { connectRabbitMQ } from './config/rabbit.js'
+import { connectRabbitMQ, initRabbitMQConsumers } from './config/rabbit.js'
 import setupModerationCron from './src/jobs/moderationCron.js'
 
 const app = express()
@@ -91,6 +91,9 @@ app.listen(PORT, () => {
 
 connectDB()
 // connectRabbitMQ()
+
+// Inicializar consumidores de RabbitMQ (incluyendo logout)
+initRabbitMQConsumers()
 
 // Iniciar cron job de moderación
 setupModerationCron()

@@ -1,5 +1,6 @@
 import amqp from 'amqplib'
 import { RABBIT_URL } from './dotenv.js'
+import { init as initLogout } from '../src/rabbit/logout.js'
 
 export const connectRabbitMQ = async () => {
   try {
@@ -16,4 +17,9 @@ export const connectRabbitMQ = async () => {
     console.error('Error conectando a RabbitMQ:', error)
     setTimeout(connectRabbitMQ, 5000)
   }
+}
+
+export const initRabbitMQConsumers = () => {
+  // Inicializa consumidores, incluyendo logout
+  initLogout()
 }

@@ -24,7 +24,9 @@ export async function authMiddleware(req, res, next) {
 
   //Consultar microservicio Auth
   try {
-    const response = await axios.get('http://localhost:3000/users/current', {
+    const authServiceUrl =
+      process.env.AUTH_SERVICE_URL || 'http://localhost:3000'
+    const response = await axios.get(`${authServiceUrl}/users/current`, {
       headers: { Authorization: `Bearer ${token}` },
     })
 
@@ -36,5 +38,13 @@ export async function authMiddleware(req, res, next) {
     return res
       .status(401)
       .json({ message: 'Unauthorized por no tener un token válido' })
+  }
+}
+
+// Función para invalidar tokens
+export function invalidate(token) {
+  if (userCache.get(token)) {
+    userCache.del(token)
+    console.log('Token invalidado: ' + token)
   }
 }
