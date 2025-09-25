@@ -5,6 +5,7 @@ import {
   getReviewById,
   moderateReview,
   getReviewsByStatus,
+  updateReview,
 } from '../controllers/review.controller.js'
 import { authMiddleware } from '../middlewares/auth.middleware.js'
 import { isAdmin } from '../middlewares/admin.middleware.js'
@@ -15,6 +16,7 @@ const router = express.Router()
 router.post('/create', authMiddleware, createReview)
 router.get('/reviews', getReviews)
 router.get('/reviews/:id', getReviewById)
+router.patch('/reviews/update/:id', authMiddleware, updateReview)
 
 // Rutas administrativas
 router.patch('/reviews/:id/moderate', authMiddleware, isAdmin, moderateReview)

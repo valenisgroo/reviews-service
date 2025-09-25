@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+// Crear reseña
 const createReviewSchema = z.object({
   userId: z.string().min(1, 'El ID de usuario es requerido'),
   productId: z.string().min(1, 'El ID del producto es requerido'),
@@ -14,6 +15,7 @@ const createReviewSchema = z.object({
     .max(500, 'El comentario no puede exceder los 500 caracteres'),
 })
 
+// Actualizar reseña
 const updateReviewSchema = z
   .object({
     rating: z
@@ -32,6 +34,7 @@ const updateReviewSchema = z
     message: 'Debe proporcionar al menos un campo para actualizar',
   })
 
+// Moderar reseña
 const moderateReviewSchema = z.object({
   decision: z.enum(['Aprobada', 'Rechazada'], {
     errorMap: () => ({
@@ -41,6 +44,7 @@ const moderateReviewSchema = z.object({
   reason: z.string().min(3).max(200).optional(),
 })
 
+// Reseñas por estado
 const getReviewsByStatusSchema = z.object({
   status: z.enum(['pending', 'moderated', 'accepted', 'rejected'], {
     errorMap: () => ({

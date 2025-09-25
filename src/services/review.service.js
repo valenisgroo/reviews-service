@@ -4,6 +4,7 @@ import {
   validateCreateReview,
   validateModerateReview,
   validateGetReviewsByStatus,
+  validateUpdateReview,
 } from '../validators/review.validator.js'
 import { CustomError } from '../utils/customError.js'
 
@@ -56,6 +57,39 @@ export const createReviewService = async reviewData => {
   }
 
   return savedReview
+}
+
+export const updateReviewService = async (id, updateData) => {
+  // Validar ID
+  if (!id || typeof id !== 'string') {
+    throw new CustomError('ID de reseña inválido', 400)
+  }
+
+  // Validar datos de actualización
+  const validationResult = validateUpdateReview(updateData)
+  if (!validationResult.success) {
+    throw new CustomError('Datos de actualización inválidos', 400)
+  }
+
+  const { rating, comment } = validationResult.data
+
+  // Buscar la reseña que esté activa (fecha_baja = null)
+  const existingReview = await Review.findOne({ _id: id, fecha_baja: null })
+  if (!existingReview) {
+    throw new CustomError('Reseña no encontrada o ya fue eliminada', 404)
+  }
+
+  const updatedReview = await Review.findByIdAndUpdate(
+    id,
+    { rating, comment },
+    { new: true }
+  )
+
+  if (!updatedReview) {
+    throw new CustomError('Error al actualizar la reseña', 500)
+  }
+
+  return updatedReview
 }
 
 export const getReviewsService = async () => {

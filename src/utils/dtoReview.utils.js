@@ -17,7 +17,5 @@ export const dtoReview = review => {
     rating,
     comment,
     status,
-    createdAt,
-    updatedAt,
   }
 }
