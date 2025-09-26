@@ -6,7 +6,7 @@ import {
   moderateReviewByIdService,
   updateReviewService,
   deleteReviewByIdService,
-  getAllReviewsOfAProductService,
+  getAllReviewsProductService,
 } from '../services/review.service.js'
 import { dtoReview } from '../utils/dtoReview.utils.js'
 import { CustomError } from '../utils/customError.js'
@@ -114,10 +114,10 @@ export const getReviewsByStatus = async (req, res) => {
   }
 }
 
-export const getAllReviewsOfAProduct = async (req, res) => {
+export const getAllReviewsProduct = async (req, res) => {
   try {
     const { productId } = req.params
-    const reviews = await getAllReviewsOfAProductService(productId)
+    const reviews = await getAllReviewsProductService(productId)
 
     res.status(200).json({
       status: 'success',

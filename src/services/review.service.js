@@ -172,7 +172,7 @@ export const getReviewsByStatusService = async queryParams => {
   }
 }
 
-export const getAllReviewsOfAProductService = async productId => {
+export const getAllReviewsProductService = async productId => {
   if (!productId || typeof productId !== 'string') {
     throw new CustomError('ID de producto inválido', 400)
   }

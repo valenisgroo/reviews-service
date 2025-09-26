@@ -7,7 +7,7 @@ import {
   getReviewsByStatus,
   updateReview,
   deletedReviewById,
-  getAllReviewsOfAProduct,
+  getAllReviewsProduct,
 } from '../controllers/review.controller.js'
 import { authMiddleware } from '../middlewares/auth.middleware.js'
 import { isAdmin } from '../middlewares/admin.middleware.js'
@@ -18,7 +18,7 @@ const router = express.Router()
 router.post('/create', authMiddleware, createReview)
 router.get('/reviews', getReviews)
 router.get('/reviews/:id', getReviewById)
-router.get('/reviews/product/:productId', getAllReviewsOfAProduct)
+router.get('/reviews/product/:productId', getAllReviewsProduct)
 router.patch('/reviews/update/:id', authMiddleware, updateReview)
 router.delete('/reviews/delete/:id', authMiddleware, deletedReviewById)
 
