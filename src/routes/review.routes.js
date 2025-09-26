@@ -6,6 +6,7 @@ import {
   moderateReview,
   getReviewsByStatus,
   updateReview,
+  deletedReviewById,
 } from '../controllers/review.controller.js'
 import { authMiddleware } from '../middlewares/auth.middleware.js'
 import { isAdmin } from '../middlewares/admin.middleware.js'
@@ -17,6 +18,7 @@ router.post('/create', authMiddleware, createReview)
 router.get('/reviews', getReviews)
 router.get('/reviews/:id', getReviewById)
 router.patch('/reviews/update/:id', authMiddleware, updateReview)
+router.delete('/reviews/delete/:id', authMiddleware, deletedReviewById)
 
 // Rutas administrativas
 router.patch('/reviews/:id/moderate', authMiddleware, isAdmin, moderateReview)

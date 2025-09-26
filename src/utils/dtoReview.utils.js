@@ -1,5 +1,5 @@
 export const dtoReview = review => {
-  const { id, userId, productId, rating, comment, status } = review
+  const { id, userId, productId, rating, comment, status, fecha_baja } = review
   return {
     id,
     userId,
@@ -7,5 +7,6 @@ export const dtoReview = review => {
     rating,
     comment,
     status,
+    fecha_baja,
   }
 }

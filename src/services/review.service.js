@@ -122,6 +122,29 @@ export const getReviewByIdService = async id => {
   return review
 }
 
+export const deleteReviewByIdService = async id => {
+  if (!id || typeof id !== 'string') {
+    throw new CustomError('ID de reseña inválido', 400)
+  }
+
+  const verfiedDelete = await Review.findOne({ _id: id, fecha_baja: null })
+  if (!verfiedDelete) {
+    throw new CustomError('Reseña no encontrada o ya fue eliminada', 404)
+  }
+
+  const deletedReview = await Review.findByIdAndUpdate(
+    id,
+    { fecha_baja: new Date() },
+    { new: true }
+  )
+
+  if (!deletedReview) {
+    throw new CustomError('Error al eliminar la reseña', 500)
+  }
+
+  return deletedReview
+}
+
 export const getReviewsByStatusService = async queryParams => {
   const validationResult = validateGetReviewsByStatus(queryParams)
   if (!validationResult.success) {

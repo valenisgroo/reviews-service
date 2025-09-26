@@ -5,6 +5,7 @@ import {
   getReviewsByStatusService,
   moderateReviewByIdService,
   updateReviewService,
+  deleteReviewByIdService,
 } from '../services/review.service.js'
 import { dtoReview } from '../utils/dtoReview.utils.js'
 import { CustomError } from '../utils/customError.js'
@@ -72,6 +73,22 @@ export const getReviewById = async (req, res) => {
     res.status(200).json({
       status: 'success',
       data: dtoReview(review),
+    })
+  } catch (error) {
+    const status = error instanceof CustomError ? error.statusCode : 500
+    return res.status(status).json({ error: error.message })
+  }
+}
+
+export const deletedReviewById = async (req, res) => {
+  try {
+    const { id } = req.params
+    const deletedReview = await deleteReviewByIdService(id)
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Reseña eliminada exitosamente',
+      data: dtoReview(deletedReview),
     })
   } catch (error) {
     const status = error instanceof CustomError ? error.statusCode : 500
