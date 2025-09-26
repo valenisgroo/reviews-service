@@ -37,15 +37,26 @@ export class RabbitFanoutConsumer {
         message => {
           if (!message) return
           const rabbitMessage = JSON.parse(message.content.toString())
-          if (this.processors.has(rabbitMessage.type)) {
-            this.processors.get(rabbitMessage.type)(rabbitMessage)
+
+          // Si no hay tipo específico, asumir que todos los mensajes del exchange "auth" son logout
+          const messageType =
+            rabbitMessage.type || (this.exchange === 'auth' ? 'logout' : null)
+
+          if (messageType && this.processors.has(messageType)) {
+            this.processors.get(messageType)(rabbitMessage)
+          } else {
+            console.log(`❌ No hay procesador para tipo: ${messageType}`)
+            console.log(
+              'Procesadores disponibles:',
+              Array.from(this.processors.keys())
+            )
           }
         },
         { noAck: true }
       )
-    } catch (err) {
-      console.error(`RabbitMQ ${this.exchange}: Error - ${err.message}`)
-      if (err.code === 'ECONNREFUSED') {
+    } catch (error) {
+      console.error(`RabbitMQ ${this.exchange}: Error - ${error.message}`)
+      if (error.code === 'ECONNREFUSED') {
         console.error(
           `RabbitMQ ${this.exchange}: No se pudo conectar a ${this.rabbitUrl}`
         )
