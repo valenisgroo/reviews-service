@@ -11,7 +11,6 @@ import { CustomError } from '../utils/customError.js'
 
 export const createReview = async (req, res) => {
   try {
-    // Tomar el userId del usuario autenticado (middleware)
     const userId = req.user._id || req.user.id
     const { productId, rating, comment } = req.body
 
@@ -53,7 +52,6 @@ export const getReviews = async (req, res) => {
   try {
     const reviews = await getReviewsService()
 
-    // Formatear las reseñas para la respuesta
     const formattedReviews = reviews.map(review => dtoReview(review))
 
     res.status(200).json({
@@ -83,7 +81,7 @@ export const getReviewById = async (req, res) => {
 
 export const getReviewsByStatus = async (req, res) => {
   try {
-    const queryParams = { ...req.params, ...req.query } // Combinar params y query
+    const queryParams = { ...req.params, ...req.query }
     const result = await getReviewsByStatusService(queryParams)
 
     res.status(200).json({
@@ -101,7 +99,7 @@ export const getReviewsByStatus = async (req, res) => {
 export const moderateReview = async (req, res) => {
   try {
     const { id } = req.params
-    const moderationData = req.body // El service ahora valida todo
+    const moderationData = req.body
 
     const updated = await moderateReviewByIdService(id, moderationData)
 

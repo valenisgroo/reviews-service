@@ -5,7 +5,6 @@ const userCache = new NodeCache({ stdTTL: 3600, checkperiod: 60 }) // cache 1 ho
 
 export async function authMiddleware(req, res, next) {
   const authHeader = req.headers['authorization']
-  console.log('Authorization header recibido:', authHeader)
   if (!authHeader)
     return res
       .status(401)
@@ -15,19 +14,13 @@ export async function authMiddleware(req, res, next) {
   if (!token)
     return res.status(401).json({ message: 'Formato de token inválido' })
 
-  // Verifica si el token fue invalidado
-  if (userCache.get(token) === 'invalidated') {
-    return res.status(401).json({ message: 'El token ha sido invalidado' })
-  }
-
-  //Revisar cache local
+  // Revisar cache local
   let userData = userCache.get(token)
   if (userData) {
     req.user = userData
     return next()
   }
 
-  //Consultar microservicio Auth
   try {
     const authServiceUrl =
       process.env.AUTH_SERVICE_URL || 'http://localhost:3000'
@@ -40,9 +33,7 @@ export async function authMiddleware(req, res, next) {
     req.user = userData
     next()
   } catch (err) {
-    return res
-      .status(401)
-      .json({ message: 'Unauthorized por no tener un token válido' })
+    return res.status(401).json({ message: 'Error: token no válido' })
   }
 }
 

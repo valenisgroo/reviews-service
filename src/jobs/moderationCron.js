@@ -2,9 +2,7 @@ import cron from 'node-cron'
 import { moderateAllReviewsBatch } from '../services/review.service.js'
 import { CustomError } from '../utils/customError.js'
 
-// Cron job que se ejecuta diariamente a las 02:00 AM
-// Formato: segundo minuto hora día mes día_semana
-// '0 0 2 * * *' = todos los días a las 2:00 AM
+// Cron job que se ejecuta diariamente a las 02:00 AM (segundo minuto hora día mes día_semana)
 const setupModerationCron = () => {
   console.log('- Configurando cron job de moderación diaria')
 
@@ -24,7 +22,7 @@ const setupModerationCron = () => {
     },
     {
       scheduled: true,
-      timezone: 'America/Argentina/Buenos_Aires', // Ajusta tu zona horaria
+      timezone: 'America/Argentina/Buenos_Aires', // Zona horaria
     }
   )
 

@@ -17,8 +17,8 @@ function processLogout(rabbitMessage) {
 
   // El auth envía "Bearer token", necesitamos extraer solo el token
   let tokenToInvalidate = rabbitMessage.message
-  if (tokenToInvalidate && tokenToInvalidate.startsWith('Bearer ')) {
-    tokenToInvalidate = tokenToInvalidate.substring(7) // Remover "Bearer "
+  if (tokenToInvalidate && tokenToInvalidate.includes(' ')) {
+    tokenToInvalidate = tokenToInvalidate.split(' ')[1] // Mismo método que auth middleware
   }
 
   console.log('2) Token a invalidar:', tokenToInvalidate)

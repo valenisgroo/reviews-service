@@ -1,15 +1,5 @@
 export const dtoReview = review => {
-  // Eliminar información sensible o innecesaria, pero incluir status
-  const {
-    id,
-    userId,
-    productId,
-    rating,
-    comment,
-    status,
-    createdAt,
-    updatedAt,
-  } = review
+  const { id, userId, productId, rating, comment, status } = review
   return {
     id,
     userId,

@@ -1,5 +1,3 @@
-// Utilidad de moderación de comentarios de reviews
-// Detecta malas palabras y enlaces sospechosos y devuelve flags para el modelo
 import moderationConfig from '../../config/moderation.js'
 
 const { forbiddenWords, links } = moderationConfig

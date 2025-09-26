@@ -60,12 +60,10 @@ export const createReviewService = async reviewData => {
 }
 
 export const updateReviewService = async (id, updateData) => {
-  // Validar ID
   if (!id || typeof id !== 'string') {
     throw new CustomError('ID de reseña inválido', 400)
   }
 
-  // Validar datos de actualización
   const validationResult = validateUpdateReview(updateData)
   if (!validationResult.success) {
     throw new CustomError('Datos de actualización inválidos', 400)
@@ -73,7 +71,6 @@ export const updateReviewService = async (id, updateData) => {
 
   const { rating, comment } = validationResult.data
 
-  // Buscar la reseña que esté activa (fecha_baja = null)
   const existingReview = await Review.findOne({ _id: id, fecha_baja: null })
   if (!existingReview) {
     throw new CustomError('Reseña no encontrada o ya fue eliminada', 404)
@@ -108,7 +105,6 @@ export const getReviewsService = async () => {
 }
 
 export const getReviewByIdService = async id => {
-  // Validar que el ID sea una cadena válida
   if (!id || typeof id !== 'string') {
     throw new CustomError('ID de reseña inválido', 400)
   }
@@ -119,7 +115,6 @@ export const getReviewByIdService = async id => {
     throw new CustomError('Reseña no encontrada', 404)
   }
 
-  // Verificar que la reseña no esté eliminada
   if (review.fecha_baja !== null) {
     throw new CustomError('Reseña no encontrada', 404)
   }
@@ -128,7 +123,6 @@ export const getReviewByIdService = async id => {
 }
 
 export const getReviewsByStatusService = async queryParams => {
-  // Validar parámetros
   const validationResult = validateGetReviewsByStatus(queryParams)
   if (!validationResult.success) {
     throw new CustomError('Parámetros de consulta inválidos', 400)
@@ -157,7 +151,6 @@ export const getReviewsByStatusService = async queryParams => {
 
 // Moderación manual
 export const moderateReviewByIdService = async (id, moderationData) => {
-  // Validar datos de moderación
   const validationResult = validateModerateReview(moderationData)
   if (!validationResult.success) {
     throw new CustomError(
@@ -168,12 +161,10 @@ export const moderateReviewByIdService = async (id, moderationData) => {
 
   const { decision, reason } = validationResult.data
 
-  // Validar ID
   if (!id || typeof id !== 'string') {
     throw new CustomError('ID de reseña inválido', 400)
   }
 
-  // Validar formato ObjectId de MongoDB
   const mongoIdPattern = /^[0-9a-fA-F]{24}$/
   if (!mongoIdPattern.test(id)) {
     throw new CustomError('Formato de ID de reseña inválido', 400)
@@ -184,12 +175,10 @@ export const moderateReviewByIdService = async (id, moderationData) => {
     throw new CustomError('Reseña no encontrada', 404)
   }
 
-  // Verificar que la reseña no esté eliminada (soft delete)
   if (review.fecha_baja !== null) {
     throw new CustomError('Reseña no encontrada', 404)
   }
 
-  // Verificar que la review esté en estado pendiente
   if (review.status !== 'pending') {
     throw new CustomError(
       'Solo se pueden moderar reseñas en estado pendiente',
@@ -228,7 +217,6 @@ export const moderateReviewByIdService = async (id, moderationData) => {
 export const moderateAllReviewsBatch = async () => {
   console.log('Iniciando moderación automática diaria')
 
-  // Buscar todas las reviews en estado 'pending' (esperando moderación)
   const reviewsToCheck = await Review.find({
     status: 'pending',
     fecha_baja: null,
@@ -256,7 +244,6 @@ export const moderateAllReviewsBatch = async () => {
       )
     }
 
-    // Actualizar la review con el resultado de la moderación
     const updatedReview = await Review.findByIdAndUpdate(review._id, {
       status: moderationResult.status,
       statusReason: moderationResult.statusReason,

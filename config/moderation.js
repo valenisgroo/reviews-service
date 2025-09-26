@@ -1,6 +1,5 @@
-// Configuración de moderación centralizada
 export default {
-  // Política de enlaces
+  // Enlaces
   links: {
     rejectAllLinks: true, // Si es true, rechaza cualquier enlace.
     allowedDomains: ['youtube.com', 'amazon.com'],
