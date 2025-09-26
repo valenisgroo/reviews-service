@@ -6,6 +6,7 @@ import {
   moderateReviewByIdService,
   updateReviewService,
   deleteReviewByIdService,
+  getAllReviewsOfAProductService,
 } from '../services/review.service.js'
 import { dtoReview } from '../utils/dtoReview.utils.js'
 import { CustomError } from '../utils/customError.js'
@@ -106,6 +107,23 @@ export const getReviewsByStatus = async (req, res) => {
       data: result.reviews.map(review => dtoReview(review)),
       total: result.total,
       filterStatus: result.status,
+    })
+  } catch (error) {
+    const status = error instanceof CustomError ? error.statusCode : 500
+    return res.status(status).json({ error: error.message })
+  }
+}
+
+export const getAllReviewsOfAProduct = async (req, res) => {
+  try {
+    const { productId } = req.params
+    const reviews = await getAllReviewsOfAProductService(productId)
+
+    res.status(200).json({
+      status: 'success',
+      message: `Reseñas del producto ${productId} obtenidas exitosamente`,
+      data: reviews.map(review => dtoReview(review)),
+      total: reviews.length,
     })
   } catch (error) {
     const status = error instanceof CustomError ? error.statusCode : 500

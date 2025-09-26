@@ -172,6 +172,22 @@ export const getReviewsByStatusService = async queryParams => {
   }
 }
 
+export const getAllReviewsOfAProductService = async productId => {
+  if (!productId || typeof productId !== 'string') {
+    throw new CustomError('ID de producto inválido', 400)
+  }
+
+  const reviews = await Review.find({ productId, fecha_baja: null })
+  if (!reviews || !Array.isArray(reviews)) {
+    throw new CustomError(
+      'Error al obtener las reseñas del producto de la base de datos',
+      500
+    )
+  }
+
+  return reviews
+}
+
 // Moderación manual
 export const moderateReviewByIdService = async (id, moderationData) => {
   const validationResult = validateModerateReview(moderationData)
