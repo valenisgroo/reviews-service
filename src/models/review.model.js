@@ -39,14 +39,14 @@ const reviewSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // Agrega createdAt y updatedAt
+    timestamps: true,
   }
 )
 
 // Validacion para evitar inyecciones
 reviewSchema.index({ userId: 1, productId: 1 }, { unique: true })
 
-// Método estático para calcular la calificación promedio de un producto
+// Método estático
 reviewSchema.statics.calculateAverageRating = async function (productId) {
   const result = await this.aggregate([
     { $match: { productId, status: 'accepted', fecha_baja: null } },

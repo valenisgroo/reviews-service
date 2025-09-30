@@ -7,8 +7,9 @@ import {
   updateReviewService,
   deleteReviewByIdService,
   getAllReviewsProductService,
+  getAverageRatingService,
 } from '../services/review.service.js'
-import { dtoReview } from '../utils/dtoReview.utils.js'
+import { dtoReview } from '../dtos/reviewDTO.js'
 import { CustomError } from '../utils/customError.js'
 
 export const createReview = async (req, res) => {
@@ -70,7 +71,6 @@ export const getReviews = async (req, res) => {
 export const getReviewById = async (req, res) => {
   try {
     const review = await getReviewByIdService(req.params.id)
-
     res.status(200).json({
       status: 'success',
       data: dtoReview(review),
@@ -124,6 +124,26 @@ export const getAllReviewsProduct = async (req, res) => {
       message: `Reseñas del producto ${productId} obtenidas exitosamente`,
       data: reviews.map(review => dtoReview(review)),
       total: reviews.length,
+    })
+  } catch (error) {
+    const status = error instanceof CustomError ? error.statusCode : 500
+    return res.status(status).json({ error: error.message })
+  }
+}
+
+export const getAverageRating = async (req, res) => {
+  try {
+    const { productId } = req.params
+    const reviews = await getAllReviewsProductService(productId)
+
+    const averageRating = await getAverageRatingService(productId)
+
+    res.status(200).json({
+      status: 'success',
+      message: `Reseñas del producto ${productId} obtenidas exitosamente`,
+      data: reviews.map(review => dtoReview(review)),
+      total: reviews.length,
+      averageRating,
     })
   } catch (error) {
     const status = error instanceof CustomError ? error.statusCode : 500

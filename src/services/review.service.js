@@ -188,6 +188,22 @@ export const getAllReviewsProductService = async productId => {
   return reviews
 }
 
+export const getAverageRatingService = async productId => {
+  if (!productId || typeof productId !== 'string') {
+    throw new CustomError('ID de producto inválido', 400)
+  }
+
+  const averageRating = await Review.calculateAverageRating(productId)
+  if (averageRating === null || averageRating === undefined) {
+    throw new CustomError(
+      'Error al calcular la calificación promedio del producto',
+      500
+    )
+  }
+
+  return averageRating
+}
+
 // Moderación manual
 export const moderateReviewByIdService = async (id, moderationData) => {
   const validationResult = validateModerateReview(moderationData)
