@@ -9,6 +9,7 @@ import {
   getAllReviewsProductService,
   getAverageRatingService,
 } from '../services/review.service.js'
+import { getProductRatingService } from '../services/productRating.service.js'
 import { dtoReview } from '../dtos/reviewDTO.js'
 import { CustomError } from '../utils/customError.js'
 
@@ -164,6 +165,22 @@ export const moderateReview = async (req, res) => {
         moderationData.decision === 'Aprobada' ? 'aprobada' : 'rechazada'
       } correctamente`,
       data: dtoReview(updated),
+    })
+  } catch (error) {
+    const status = error instanceof CustomError ? error.statusCode : 500
+    return res.status(status).json({ error: error.message })
+  }
+}
+
+export const getProductRating = async (req, res) => {
+  try {
+    const { productId } = req.params
+    const ratingInfo = await getProductRatingService(productId)
+
+    res.status(200).json({
+      status: 'success',
+      message: `Información de rating del producto ${productId} obtenida exitosamente`,
+      data: ratingInfo,
     })
   } catch (error) {
     const status = error instanceof CustomError ? error.statusCode : 500

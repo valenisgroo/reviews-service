@@ -7,6 +7,7 @@ import {
   validateUpdateReview,
 } from '../validators/review.validator.js'
 import { CustomError } from '../utils/customError.js'
+import { updateProductRatingService } from './productRating.service.js'
 
 export const createReviewService = async reviewData => {
   const validateData = validateCreateReview(reviewData)
@@ -140,6 +141,11 @@ export const deleteReviewByIdService = async id => {
 
   if (!deletedReview) {
     throw new CustomError('Error al eliminar la reseña', 500)
+  }
+
+  // Si la reseña eliminada estaba aceptada, actualizar el rating del producto
+  if (verfiedDelete.status === 'accepted') {
+    await updateProductRatingService(verfiedDelete.productId)
   }
 
   return deletedReview

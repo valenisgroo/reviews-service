@@ -9,6 +9,7 @@ import {
   deletedReviewById,
   getAllReviewsProduct,
   getAverageRating,
+  getProductRating,
 } from '../controllers/review.controller.js'
 import { authMiddleware } from '../middlewares/auth.middleware.js'
 import { isAdmin } from '../middlewares/admin.middleware.js'
@@ -20,9 +21,10 @@ router.post('/create', authMiddleware, createReview)
 router.get('/reviews', getReviews)
 router.get('/reviews/:id', getReviewById)
 router.get('/reviews/product/:productId', getAllReviewsProduct)
-router.get('/reviews/average/:productId', getAverageRating)
+router.get('/reviews/average/:productId', getAverageRating) //Este no me sirve
 router.patch('/reviews/update/:id', authMiddleware, updateReview)
 router.delete('/reviews/delete/:id', authMiddleware, deletedReviewById)
+router.get('/products/:productId/rating', getProductRating)
 
 // Rutas administrativas
 router.patch('/reviews/:id/moderate', authMiddleware, isAdmin, moderateReview)
