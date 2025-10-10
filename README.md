@@ -1,5 +1,7 @@
 # Microservicio de Reseñas
 
+###
+
 **Autor:** Valentino Isgró  
 **Legajo:** 50438  
 **Universidad:** Universidad Tecnológica Nacional (UTN)  
@@ -84,7 +86,7 @@ npm run dev
 
 ## Autor
 
-Desarrollado como parte del sistema de microservicios para e-commerce.
+Valentino Isgró.
 
 ## Licencia
 
