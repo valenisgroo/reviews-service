@@ -210,7 +210,7 @@ Modelo de cache para almacenar ratings pre-calculados de productos. Mejora la pe
 
 #### Crear Review
 
-`POST /api/create`
+`POST /create`
 
 **Headers**
 
@@ -289,7 +289,7 @@ Authorization: Bearer {token}
 
 #### Obtener todas las Reviews
 
-`GET /api/reviews`
+`GET /reviews`
 
 **Query Parameters (opcionales)**
 
@@ -327,7 +327,7 @@ Authorization: Bearer {token}
 
 #### Obtener Review por ID
 
-`GET /api/reviews/{id}`
+`GET /reviews/{id}`
 
 **Params path**
 
@@ -365,7 +365,7 @@ Authorization: Bearer {token}
 
 #### Actualizar Review
 
-`PATCH /api/reviews/update/{id}`
+`PATCH /reviews/update/{id}`
 
 **Headers**
 
@@ -435,7 +435,7 @@ Authorization: Bearer {token}
 
 #### Eliminar Review
 
-`DELETE /api/reviews/delete/{id}`
+`DELETE /reviews/delete/{id}`
 
 **Headers**
 
@@ -498,7 +498,7 @@ Authorization: Bearer {token}
 
 #### Obtener todas las Reviews de un Producto
 
-`GET /api/reviews/product/{productId}`
+`GET /reviews/product/{productId}`
 
 **Params path**
 
@@ -538,7 +538,7 @@ Authorization: Bearer {token}
 
 #### Obtener Rating Promedio de un Producto
 
-`GET /api/reviews/average/{productId}`
+`GET /reviews/average/{productId}`
 
 **Params path**
 
@@ -573,7 +573,7 @@ Authorization: Bearer {token}
 
 #### Obtener Información de Rating de un Producto
 
-`GET /api/products/{productId}/rating`
+`GET /products/{productId}/rating`
 
 **Params path**
 
@@ -589,15 +589,9 @@ Authorization: Bearer {token}
   "message": "Información de rating del producto 64a1b2c3d4e5f6789abcdef0 obtenida exitosamente",
   "data": {
     "productId": "64a1b2c3d4e5f6789abcdef0",
-    "averageRating": 4.5,
-    "totalReviews": 10,
-    "ratingDistribution": {
-      "5": 6,
-      "4": 2,
-      "3": 1,
-      "2": 1,
-      "1": 0
-    }
+    "totalRating": 45,
+    "reviewCount": 10,
+    "averageRating": 4.5
   }
 }
 ```
@@ -606,7 +600,7 @@ Authorization: Bearer {token}
 
 #### Moderar Review
 
-`PATCH /api/reviews/{id}/moderate`
+`PATCH /reviews/{id}/moderate`
 
 **Headers**
 
@@ -693,7 +687,7 @@ O para rechazar:
 
 #### Obtener Reviews por Estado
 
-`GET /api/admin/reviews/{status}`
+`GET /admin/reviews/{status}`
 
 **Headers**
 
@@ -754,7 +748,7 @@ Authorization: Bearer {token}
 
 #### Verificar Compra Manualmente
 
-`POST /api/reviews/{id}/verify-order`
+`POST /reviews/{id}/verify-order`
 
 **Headers**
 
