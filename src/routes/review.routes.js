@@ -49,18 +49,6 @@ router.post('/create', authMiddleware, createReview)
  *     tags: [Reviews]
  *     parameters:
  *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           default: 1
- *         description: Número de página
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 10
- *         description: Cantidad de resultados por página
- *       - in: query
  *         name: product_id
  *         schema:
  *           type: string
@@ -70,35 +58,9 @@ router.post('/create', authMiddleware, createReview)
  *         schema:
  *           type: string
  *         description: Filtrar por ID de usuario
- *       - in: query
- *         name: sortBy
- *         schema:
- *           type: string
- *           default: createdAt
- *         description: Campo para ordenar
- *       - in: query
- *         name: sortOrder
- *         schema:
- *           type: string
- *           enum: [asc, desc]
- *           default: desc
- *         description: Orden de clasificación
  *     responses:
  *       200:
  *         description: Lista de reseñas
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 data:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Review'
- *                 pagination:
- *                   type: object
  */
 router.get('/reviews', getReviews)
 
@@ -136,16 +98,6 @@ router.get('/reviews/:id', getReviewById)
  *         schema:
  *           type: string
  *         description: ID del producto
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           default: 1
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 10
  *       - in: query
  *         name: status
  *         schema:
@@ -308,16 +260,6 @@ router.patch('/reviews/:id/moderate', authMiddleware, isAdmin, moderateReview)
  *           type: string
  *           enum: [pending, moderated, accepted, rejected]
  *         description: Estado de las reseñas
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           default: 1
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 10
  *     responses:
  *       200:
  *         description: Reseñas por estado

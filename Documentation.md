@@ -47,7 +47,7 @@
   - El sistema permite consultar reseñas sin autenticación
   - Se pueden filtrar por `product_id`, `user_id`, `status`
   - Se pueden ordenar por diferentes campos (`createdAt`, `rating`)
-  - Se devuelve la lista de reseñas con paginación
+  - Se devuelve la lista de reseñas
 
 - Caminos alternativos:
 
@@ -82,7 +82,7 @@
   - El admin solicita ver todas las reseñas en un estado específico (`pending`, `moderated`, `accepted`, `rejected`)
   - El sistema valida que el usuario tenga rol de administrador
   - Se buscan todas las reseñas con ese estado que no estén dadas de baja
-  - Se devuelve la lista de reseñas con paginación
+  - Se devuelve la lista de reseñas
 
 - Caminos alternativos:
 
@@ -149,25 +149,25 @@
 
 **Review**
 
-- \_id: ObjectId (generado automáticamente por MongoDB)
+- \_id: ObjectId
 
-- userId: String (requerido, ID del usuario que creó la reseña)
+- userId: String
 
-- productId: String (requerido, ID del producto reseñado)
+- productId: String
 
-- rating: Number (requerido, mínimo 1, máximo 5)
+- rating: Number
 
-- comment: String (requerido, mínimo 5 caracteres, máximo 500)
+- comment: String
 
-- status: String (enum: `pending`, `moderated`, `accepted`, `rejected`, default: `pending`)
+- status: String (enum)
 
-- statusReason: String (opcional, explicación de la decisión de moderación)
+- statusReason: String
 
-- fecha_baja: Date (null si no está eliminada, fecha de eliminación si fue borrada)
+- fecha_baja: Date
 
-- createdAt: Date (timestamp de creación, automático)
+- createdAt: Date
 
-- updatedAt: Date (timestamp de última actualización, automático)
+- updatedAt: Date
 
 **Índices:**
 
@@ -177,21 +177,19 @@
 
 **ProductRating**
 
-Modelo de cache para almacenar ratings pre-calculados de productos. Mejora la performance de consultas de rating hasta **100x** al evitar recalcular desde todas las reseñas cada vez.
+- \_id: ObjectId
 
-- \_id: ObjectId (generado automáticamente por MongoDB)
+- productId: String
 
-- productId: String (requerido, único, ID del producto)
+- totalRating: Number
 
-- totalRating: Number (requerido, suma total de todos los ratings aceptados)
+- reviewCount: Number
 
-- reviewCount: Number (requerido, cantidad de reseñas aceptadas)
+- averageRating: Number
 
-- averageRating: Number (requerido, rating promedio = totalRating / reviewCount)
+- createdAt: Date
 
-- createdAt: Date (timestamp de creación, automático)
-
-- updatedAt: Date (timestamp de última actualización, automático)
+- updatedAt: Date
 
 **Índices:**
 
@@ -290,15 +288,6 @@ Authorization: Bearer {token}
 #### Obtener todas las Reviews
 
 `GET /reviews`
-
-**Query Parameters (opcionales)**
-
-- `page`: Número de página (default: 1)
-- `limit`: Cantidad de resultados por página (default: 10)
-- `product_id`: Filtrar por ID de producto
-- `user_id`: Filtrar por ID de usuario
-- `sortBy`: Campo para ordenar (default: createdAt)
-- `sortOrder`: Orden (asc/desc, default: desc)
 
 **Response**
 
@@ -504,12 +493,6 @@ Authorization: Bearer {token}
 
 - `productId`: ID del producto
 
-**Query Parameters (opcionales)**
-
-- `page`: Número de página (default: 1)
-- `limit`: Cantidad de resultados por página (default: 10)
-- `status`: Filtrar por estado (default: accepted)
-
 **Response**
 
 `200 OK`
@@ -698,11 +681,6 @@ Authorization: Bearer {token}
 **Params path**
 
 - `status`: Estado de las reseñas (pending, moderated, accepted, rejected)
-
-**Query Parameters (opcionales)**
-
-- `page`: Número de página (default: 1)
-- `limit`: Cantidad de resultados por página (default: 10)
 
 **Response**
 
