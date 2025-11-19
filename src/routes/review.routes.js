@@ -9,7 +9,8 @@ import {
   deletedReviewById,
   getAllReviewsProduct,
   getAverageRating,
-  getProductRating
+  getProductRating,
+  verifyReviewOrder,
 } from '../controllers/review.controller.js'
 import { authMiddleware } from '../middlewares/auth.middleware.js'
 import { isAdmin } from '../middlewares/admin.middleware.js'
@@ -325,6 +326,43 @@ router.patch('/reviews/:id/moderate', authMiddleware, isAdmin, moderateReview)
  *       403:
  *         description: No autorizado (requiere rol admin)
  */
-router.get('/admin/reviews/:status', authMiddleware, isAdmin, getReviewsByStatus)
+router.get(
+  '/admin/reviews/:status',
+  authMiddleware,
+  isAdmin,
+  getReviewsByStatus
+)
+
+/**
+ * @swagger
+ * /reviews/{id}/verify-order:
+ *   post:
+ *     summary: Verificar manualmente si existe orden para una reseña (Admin)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la reseña
+ *     responses:
+ *       200:
+ *         description: Verificación completada
+ *       400:
+ *         description: Estado de reseña inválido
+ *       401:
+ *         description: No autenticado
+ *       403:
+ *         description: No autorizado
+ */
+router.post(
+  '/reviews/:id/verify-order',
+  authMiddleware,
+  isAdmin,
+  verifyReviewOrder
+)
 
 export default router

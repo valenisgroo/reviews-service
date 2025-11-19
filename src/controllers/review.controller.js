@@ -9,7 +9,10 @@ import {
   getAllReviewsProductService,
   getAverageRatingService,
 } from '../services/review.service.js'
-import { getProductRatingService } from '../services/productRating.service.js'
+import {
+  getProductRatingService,
+  updateProductRatingService,
+} from '../services/productRating.service.js'
 import { dtoReview } from '../dtos/reviewDTO.js'
 import { CustomError } from '../utils/customError.js'
 
@@ -181,6 +184,53 @@ export const getProductRating = async (req, res) => {
       status: 'success',
       message: `Información de rating del producto ${productId} obtenida exitosamente`,
       data: ratingInfo,
+    })
+  } catch (error) {
+    const status = error instanceof CustomError ? error.statusCode : 500
+    return res.status(status).json({ error: error.message })
+  }
+}
+
+export const verifyReviewOrder = async (req, res) => {
+  try {
+    const { id } = req.params
+    const authHeader = req.headers['authorization']
+
+    const review = await getReviewByIdService(id)
+
+    if (review.status !== 'moderated') {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Solo se pueden verificar reseñas en estado "moderated"',
+      })
+    }
+
+    const { checkUserHasPurchasedProduct } = await import(
+      '../services/orderVerification.service.js'
+    )
+    const hasPurchased = await checkUserHasPurchasedProduct(
+      review.userId,
+      review.productId,
+      authHeader?.split(' ')[1]
+    )
+
+    if (hasPurchased) {
+      review.status = 'accepted'
+      review.statusReason = 'Compra verificada manualmente'
+      await review.save()
+      await updateProductRatingService(review.productId)
+    } else {
+      review.status = 'rejected'
+      review.statusReason = 'Compra no verificada'
+      await review.save()
+    }
+
+    res.status(200).json({
+      status: 'success',
+      message: `Reseña ${
+        hasPurchased ? 'aceptada' : 'rechazada'
+      } - verificación manual completada`,
+      data: dtoReview(review),
     })
   } catch (error) {
     const status = error instanceof CustomError ? error.statusCode : 500

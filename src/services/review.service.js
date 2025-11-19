@@ -271,6 +271,10 @@ export const moderateReviewByIdService = async (id, moderationData) => {
     )
   }
 
+  if (newStatus === 'moderated') {
+    console.log(`⏳ Reseña ${updated._id} marcada como 'moderated' - esperando verificación de orden`)
+  }
+
   return updated
 }
 
@@ -308,7 +312,7 @@ export const moderateAllReviewsBatch = async () => {
     const updatedReview = await Review.findByIdAndUpdate(review._id, {
       status: moderationResult.status,
       statusReason: moderationResult.statusReason,
-    })
+    }, { new: true })
 
     if (!updatedReview) {
       throw new CustomError(
@@ -324,7 +328,7 @@ export const moderateAllReviewsBatch = async () => {
       )
     } else {
       moderatedCount++
-      console.log(`✅ Review ${review._id} marcada como moderada`)
+      console.log(`✅ Review ${review._id} marcada como moderada - esperando verificación de orden`)
     }
   }
 

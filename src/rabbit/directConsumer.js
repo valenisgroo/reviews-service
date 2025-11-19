@@ -1,10 +1,10 @@
 import amqp from 'amqplib'
-
 import { RABBIT_URL } from '../../config/dotenv.js'
 
-export class RabbitFanoutConsumer {
-  constructor(exchange) {
+export class RabbitDirectConsumer {
+  constructor(exchange, routingKey) {
     this.exchange = exchange
+    this.routingKey = routingKey
     this.rabbitUrl = RABBIT_URL
     this.processors = new Map()
     console.log(`RabbitMQ ${this.exchange}: usando URL ${this.rabbitUrl}`)
@@ -30,9 +30,9 @@ export class RabbitFanoutConsumer {
 
       console.log('RabbitMQ ' + this.exchange + ' conectado')
 
-      await channel.assertExchange(this.exchange, 'fanout', { durable: false })
+      await channel.assertExchange(this.exchange, 'direct', { durable: false })
       const queue = await channel.assertQueue('', { exclusive: true })
-      await channel.bindQueue(queue.queue, this.exchange, '')
+      await channel.bindQueue(queue.queue, this.exchange, this.routingKey)
 
       channel.consume(
         queue.queue,
@@ -40,12 +40,12 @@ export class RabbitFanoutConsumer {
           if (!message) return
           const rabbitMessage = JSON.parse(message.content.toString())
 
-          // Si no hay tipo específico, asumir que todos los mensajes del exchange "auth" son logout
-          const messageType =
-            rabbitMessage.type || (this.exchange === 'auth' ? 'logout' : null)
+          const messageType = rabbitMessage.type || 'default'
 
-          if (messageType && this.processors.has(messageType)) {
+          if (this.processors.has(messageType)) {
             this.processors.get(messageType)(rabbitMessage)
+          } else if (this.processors.has('default')) {
+            this.processors.get('default')(rabbitMessage)
           } else {
             console.log(`❌ No hay procesador para tipo: ${messageType}`)
             console.log(

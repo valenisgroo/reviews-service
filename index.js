@@ -5,6 +5,7 @@ import { PORT } from './config/dotenv.js'
 import { connectDB } from './config/bd.js'
 import reviewRoutes from './src/routes/review.routes.js'
 import { init as initLogout } from './src/rabbit/logout.js'
+import { init as initOrderVerification } from './src/rabbit/orderVerification.js'
 import setupModerationCron from './src/jobs/moderationCron.js'
 import swaggerUi from 'swagger-ui-express'
 import swaggerSpec from './src/config/swagger.js'
@@ -40,14 +41,15 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`)
   console.log(
-    `Documentación API disponible en http://localhost:${PORT}/api-docs`
+    `SWAGGER - Documentación API disponible en http://localhost:${PORT}/api-docs`
   )
 })
 
 connectDB()
 
-// Inicializar consumidores de RabbitMQ (incluyendo logout)
+// Inicializar consumidores de RabbitMQ
 initLogout()
+initOrderVerification()
 
 // Iniciar cron job de moderación
 setupModerationCron()

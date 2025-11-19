@@ -1,4 +1,5 @@
 import swaggerJSDoc from 'swagger-jsdoc'
+import { PORT } from '../../config/dotenv.js'
 
 const swaggerOptions = {
   definition: {
@@ -10,7 +11,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: 'http://localhost:5555',
+        url: `http://localhost:${PORT}`,
       },
     ],
     components: {

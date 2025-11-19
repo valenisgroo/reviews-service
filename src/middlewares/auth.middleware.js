@@ -1,5 +1,6 @@
 import axios from 'axios'
 import NodeCache from 'node-cache'
+import { AUTH_SERVICE_URL } from '../../config/dotenv.js'
 
 const userCache = new NodeCache({ stdTTL: 3600, checkperiod: 60 }) // cache 1 hora
 
@@ -22,9 +23,7 @@ export async function authMiddleware(req, res, next) {
   }
 
   try {
-    const authServiceUrl =
-      process.env.AUTH_SERVICE_URL || 'http://localhost:3000'
-    const response = await axios.get(`${authServiceUrl}/users/current`, {
+    const response = await axios.get(`${AUTH_SERVICE_URL}/users/current`, {
       headers: { Authorization: `Bearer ${token}` },
     })
 
