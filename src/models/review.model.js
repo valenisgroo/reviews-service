@@ -40,20 +40,12 @@ const reviewSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    versionKey: false,
   }
 )
 
-// Validacion para evitar inyecciones
+// Índice único para evitar reviews duplicadas del mismo usuario al mismo producto
 reviewSchema.index({ userId: 1, productId: 1 }, { unique: true })
-
-// Método estático
-reviewSchema.statics.calculateAverageRating = async function (productId) {
-  const result = await this.aggregate([
-    { $match: { productId, status: 'accepted', fecha_baja: null } },
-    { $group: { _id: null, averageRating: { $avg: '$rating' } } },
-  ])
-  return result.length > 0 ? Math.round(result[0].averageRating * 10) / 10 : 0
-}
 
 const Review = mongoose.model('Review', reviewSchema)
 

@@ -39,5 +39,4 @@ export async function authMiddleware(req, res, next) {
 // Función para invalidar tokens
 export function invalidate(token) {
   userCache.del(token)
-  console.log('Token invalidado: ' + token)
 }

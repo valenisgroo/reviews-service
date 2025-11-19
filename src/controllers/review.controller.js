@@ -7,7 +7,6 @@ import {
   updateReviewService,
   deleteReviewByIdService,
   getAllReviewsProductService,
-  getAverageRatingService,
 } from '../services/review.service.js'
 import {
   getProductRatingService,
@@ -140,14 +139,15 @@ export const getAverageRating = async (req, res) => {
     const { productId } = req.params
     const reviews = await getAllReviewsProductService(productId)
 
-    const averageRating = await getAverageRatingService(productId)
+    // Usar el modelo ProductRating (RÁPIDO) en lugar de recalcular
+    const ratingInfo = await getProductRatingService(productId)
 
     res.status(200).json({
       status: 'success',
       message: `Reseñas del producto ${productId} obtenidas exitosamente`,
       data: reviews.map(review => dtoReview(review)),
       total: reviews.length,
-      averageRating,
+      averageRating: ratingInfo.averageRating, // Rating precalculado
     })
   } catch (error) {
     const status = error instanceof CustomError ? error.statusCode : 500
