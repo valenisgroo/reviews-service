@@ -8,6 +8,7 @@ Sistema de gestión de reseñas de productos con moderación, verificación de c
 
 ```bash
 git clone https://github.com/valenisgroo/reviews-service.git
+
 cd reviews-service
 ```
 
@@ -24,7 +25,7 @@ npm run dev
 npm start
 ```
 
-### Con Docker 🐳
+### Con Docker
 
 ```bash
 # Construir imagen
