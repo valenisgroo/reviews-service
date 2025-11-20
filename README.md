@@ -4,6 +4,15 @@ Sistema de gestión de reseñas de productos con moderación, verificación de c
 
 ## Inicio Rápido
 
+### Clonar el repositorio
+
+```bash
+git clone https://github.com/valenisgroo/reviews-service.git
+cd reviews-service
+```
+
+### Con Node.js
+
 ```bash
 # Instalar dependencias
 npm install
@@ -13,6 +22,16 @@ npm run dev
 
 # Producción
 npm start
+```
+
+### Con Docker 🐳
+
+```bash
+# Construir imagen
+docker build -t reviews-service .
+
+# Ejecutar contenedor
+docker run -p 5555:5555 --env-file .env reviews-service
 ```
 
 ## Configuración
@@ -29,12 +48,12 @@ ORDERS_SERVICE_URL=http://localhost:3004
 
 ## Características
 
-- ✅ CRUD de reseñas con autenticación JWT
-- ✅ Moderación de contenido (manual y automática)
-- ✅ Verificación de compras vía RabbitMQ
-- ✅ Modelo de ratings (ProductRating) para performance optimizada
-- ✅ Flujo de estados: pending → moderated → accepted
-- ✅ Documentación interactiva con Swagger
+- CRUD de reseñas con autenticación JWT
+- Moderación de contenido (manual y automática)
+- Verificación de compras vía RabbitMQ
+- Modelo de ratings (ProductRating) para performance optimizada
+- Flujo de estados: pending → moderated → accepted
+- Documentación con Swagger
 
 ## API
 
