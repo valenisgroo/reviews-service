@@ -1,7 +1,7 @@
 # Microservicio de Reseñas
 
 **Autor:** Valentino Isgró  
-**Legajo:** 50438  
+**Legajo:** 50368  
 **Universidad:** Universidad Tecnológica Nacional (UTN)  
 **Materia:** Arquitectura de Microservicios  
 **Año:** 2025

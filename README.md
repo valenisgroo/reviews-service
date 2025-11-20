@@ -62,4 +62,4 @@ Endpoints principales:
 
 ---
 
-**Autor:** Valentino Isgró | **Legajo:** 50438 | **UTN - Arquitectura de Microservicios 2025**
+**Autor:** Valentino Isgró | **Legajo:** 50368 | **UTN - Arquitectura de Microservicios 2025**
