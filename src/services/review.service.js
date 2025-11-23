@@ -7,7 +7,10 @@ import {
   validateUpdateReview,
 } from '../validators/review.validator.js'
 import { CustomError } from '../utils/customError.js'
-import { updateProductRatingService } from './productRating.service.js'
+import {
+  decrementProductRating,
+  changeProductRating,
+} from './productRating.service.js'
 
 export const createReviewService = async reviewData => {
   const validateData = validateCreateReview(reviewData)
@@ -77,6 +80,19 @@ export const updateReviewService = async (id, updateData) => {
     throw new CustomError('Error al actualizar la reseña', 500)
   }
 
+  // Si la review está aceptada y cambió el rating, actualizar ProductRating
+  if (
+    existingReview.status === 'accepted' &&
+    rating &&
+    rating !== existingReview.rating
+  ) {
+    await changeProductRating(
+      existingReview.productId,
+      existingReview.rating,
+      rating
+    )
+  }
+
   return updatedReview
 }
 
@@ -135,7 +151,7 @@ export const deleteReviewByIdService = async id => {
 
   // Si la reseña eliminada estaba aceptada, actualizar el rating del producto
   if (verfiedDelete.status === 'accepted') {
-    await updateProductRatingService(verfiedDelete.productId)
+    await decrementProductRating(verfiedDelete.productId, verfiedDelete.rating)
   }
 
   return deletedReview

@@ -10,7 +10,7 @@ import {
 } from '../services/review.service.js'
 import {
   getProductRatingService,
-  updateProductRatingService,
+  incrementProductRating,
 } from '../services/productRating.service.js'
 import { dtoReview } from '../dtos/reviewDTO.js'
 import { CustomError } from '../utils/customError.js'
@@ -218,7 +218,7 @@ export const verifyReviewOrder = async (req, res) => {
       review.status = 'accepted'
       review.statusReason = 'Compra verificada manualmente'
       await review.save()
-      await updateProductRatingService(review.productId)
+      await incrementProductRating(review.productId, review.rating)
     } else {
       review.status = 'rejected'
       review.statusReason = 'Compra no verificada'

@@ -1,6 +1,6 @@
 import { RabbitDirectConsumer } from './directConsumer.js'
 import Review from '../models/review.model.js'
-import { updateProductRatingService } from '../services/productRating.service.js'
+import { incrementProductRating } from '../services/productRating.service.js'
 
 export function init() {
   const directConsumer = new RabbitDirectConsumer('place_order', 'place_order')
@@ -54,7 +54,7 @@ async function processOrderPlaced(rabbitMessage) {
         review.statusReason = `Reseña aprobada debido a producto verificado`
         await review.save()
 
-        await updateProductRatingService(review.productId)
+        await incrementProductRating(review.productId, review.rating)
 
         console.log(
           `Reseña ${review._id} aceptada debido a producto ${review.productId} verificado.`

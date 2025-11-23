@@ -57,3 +57,99 @@ export const updateProductRatingService = async productId => {
     averageRating,
   }
 }
+
+export const incrementProductRating = async (productId, rating) => {
+  const updated = await ProductRating.findOneAndUpdate(
+    { productId },
+    [
+      {
+        $set: {
+          totalRating: { $add: [{ $ifNull: ['$totalRating', 0] }, rating] },
+          reviewCount: { $add: [{ $ifNull: ['$reviewCount', 0] }, 1] }
+        }
+      },
+      {
+        $set: {
+          averageRating: {
+            $cond: [
+              { $gt: [{ $ifNull: ['$reviewCount', 0] }, 0] },
+              { $round: [{ $divide: ['$totalRating', '$reviewCount'] }, 1] },
+              0
+            ]
+          }
+        }
+      }
+    ],
+    { upsert: true, new: true }
+  )
+
+  return {
+    productId,
+    totalRating: updated.totalRating,
+    reviewCount: updated.reviewCount,
+    averageRating: updated.averageRating
+  }
+}
+
+export const decrementProductRating = async (productId, rating) => {
+  const updated = await ProductRating.findOneAndUpdate(
+    { productId },
+    [
+      {
+        $set: {
+          totalRating: { $max: [{ $subtract: [{ $ifNull: ['$totalRating', 0] }, rating] }, 0] },
+          reviewCount: { $max: [{ $subtract: [{ $ifNull: ['$reviewCount', 0] }, 1] }, 0] }
+        }
+      },
+      {
+        $set: {
+          averageRating: {
+            $cond: [
+              { $gt: [{ $ifNull: ['$reviewCount', 0] }, 0] },
+              { $round: [{ $divide: ['$totalRating', '$reviewCount'] }, 1] },
+              0
+            ]
+          }
+        }
+      }
+    ],
+    { upsert: true, new: true }
+  )
+
+  return {
+    productId,
+    totalRating: updated.totalRating,
+    reviewCount: updated.reviewCount,
+    averageRating: updated.averageRating
+  }
+}
+
+export const changeProductRating = async (productId, oldRating, newRating) => {
+  const diff = newRating - oldRating
+  
+  const updated = await ProductRating.findOneAndUpdate(
+    { productId },
+    [
+      { $set: { totalRating: { $add: [{ $ifNull: ['$totalRating', 0] }, diff] } } },
+      {
+        $set: {
+          averageRating: {
+            $cond: [
+              { $gt: [{ $ifNull: ['$reviewCount', 0] }, 0] },
+              { $round: [{ $divide: ['$totalRating', '$reviewCount'] }, 1] },
+              0
+            ]
+          }
+        }
+      }
+    ],
+    { upsert: true, new: true }
+  )
+
+  return {
+    productId,
+    totalRating: updated.totalRating,
+    reviewCount: updated.reviewCount,
+    averageRating: updated.averageRating
+  }
+}
