@@ -13,5 +13,5 @@ export default {
   },
 
   // Palabras prohibidas
-  forbiddenWords: ['mierda', 'idiota', 'estafa', 'timo', 'spam', 'imbécil'],
+  forbiddenWords: ['mierda', 'idiota', 'boludo', 'spam', 'imbécil'],
 }
