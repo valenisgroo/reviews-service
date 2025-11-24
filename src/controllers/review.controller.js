@@ -12,6 +12,7 @@ import {
   getProductRatingService,
   incrementProductRating,
 } from '../services/productRating.service.js'
+import { checkUserHasPurchasedProduct } from '../services/orderVerification.service.js'
 import { dtoReview } from '../dtos/reviewDTO.js'
 import { CustomError } from '../utils/customError.js'
 
@@ -139,15 +140,13 @@ export const getAverageRating = async (req, res) => {
     const { productId } = req.params
     const reviews = await getAllReviewsProductService(productId)
 
-    // Usar el modelo ProductRating (RÁPIDO) en lugar de recalcular
     const ratingInfo = await getProductRatingService(productId)
 
     res.status(200).json({
       status: 'success',
       message: `Reseñas del producto ${productId} obtenidas exitosamente`,
-      data: reviews.map(review => dtoReview(review)),
       total: reviews.length,
-      averageRating: ratingInfo.averageRating, // Rating precalculado
+      averageRating: ratingInfo.averageRating,
     })
   } catch (error) {
     const status = error instanceof CustomError ? error.statusCode : 500
@@ -196,22 +195,23 @@ export const verifyReviewOrder = async (req, res) => {
     const { id } = req.params
     const authHeader = req.headers['authorization']
 
+    if (!authHeader) {
+      throw new CustomError('Token de autorización requerido', 401)
+    }
+
     const review = await getReviewByIdService(id)
 
     if (review.status !== 'moderated') {
-      return res.status(400).json({
-        status: 'error',
-        message: 'Solo se pueden verificar reseñas en estado "moderated"',
-      })
+      throw new CustomError(
+        'Solo se pueden verificar reseñas en estado "moderated"',
+        400
+      )
     }
 
-    const { checkUserHasPurchasedProduct } = await import(
-      '../services/orderVerification.service.js'
-    )
     const hasPurchased = await checkUserHasPurchasedProduct(
       review.userId,
       review.productId,
-      authHeader?.split(' ')[1]
+      authHeader.split(' ')[1]
     )
 
     if (hasPurchased) {

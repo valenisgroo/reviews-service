@@ -70,18 +70,24 @@ export const updateReviewService = async (id, updateData) => {
     throw new CustomError('Reseña no encontrada o ya fue eliminada', 404)
   }
 
-  const updatedReview = await Review.findByIdAndUpdate(
-    id,
-    { rating, comment },
-    { new: true }
-  )
+  let newStatus = existingReview.status
+  let newStatusReason = existingReview.statusReason
 
-  if (!updatedReview) {
-    throw new CustomError('Error al actualizar la reseña', 500)
+  // Si el comentario cambió, volver a pending para re-moderación
+  if (comment && comment !== existingReview.comment) {
+    newStatus = 'pending'
+    newStatusReason = 'Reseña editada - esperando nueva moderación'
+
+    // Si estaba accepted, decrementar ProductRating
+    if (existingReview.status === 'accepted') {
+      await decrementProductRating(
+        existingReview.productId,
+        existingReview.rating
+      )
+    }
   }
-
-  // Si la review está aceptada y cambió el rating, actualizar ProductRating
-  if (
+  // Si solo cambió el rating y estaba accepted, actualizar ProductRating
+  else if (
     existingReview.status === 'accepted' &&
     rating &&
     rating !== existingReview.rating
@@ -91,6 +97,21 @@ export const updateReviewService = async (id, updateData) => {
       existingReview.rating,
       rating
     )
+  }
+
+  const updatedReview = await Review.findByIdAndUpdate(
+    id,
+    {
+      rating,
+      comment,
+      status: newStatus,
+      statusReason: newStatusReason,
+    },
+    { new: true }
+  )
+
+  if (!updatedReview) {
+    throw new CustomError('Error al actualizar la reseña', 500)
   }
 
   return updatedReview

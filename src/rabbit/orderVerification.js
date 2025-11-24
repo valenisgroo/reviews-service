@@ -2,6 +2,7 @@ import { RabbitDirectConsumer } from './directConsumer.js'
 import Review from '../models/review.model.js'
 import { incrementProductRating } from '../services/productRating.service.js'
 
+// Inicialización del consumidor
 export function init() {
   const directConsumer = new RabbitDirectConsumer('place_order', 'place_order')
   directConsumer.addProcessor('default', processOrderPlaced)
@@ -9,11 +10,6 @@ export function init() {
 }
 
 async function processOrderPlaced(rabbitMessage) {
-  console.log(
-    '📦 RabbitMQ - Orden creada recibida:',
-    JSON.stringify(rabbitMessage, null, 2)
-  )
-
   // El mensaje puede venir anidado en 'message' o directamente
   const orderData = rabbitMessage.message || rabbitMessage
 
